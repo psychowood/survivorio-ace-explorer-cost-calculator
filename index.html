@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Cost Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1{
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding: 20px;
+        }
+        .icon-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .item {
+            text-align: center;
+            margin: 10px;
+            width: 120px;
+        }
+        .item .name {
+            font-weight: bold;
+            height: 25px
+        }
+        .icon {
+            width: 60px;
+            height: 60px;
+            background-image: url('sprites.png');
+            background-repeat: no-repeat;
+            background-size: 660px 60px;
+            display: inline-block;
+        }
+        .icon-wood { background-position: 0 0; }
+        .icon-iron { background-position: -60px 0; }
+        .icon-steel { background-position: -120px 0; }
+        .icon-crystone { background-position: -180px 0; }
+        .icon-weapon-supply-crate { background-position: -240px 0; }
+        .icon-medical-supply-crate { background-position: -300px 0; }
+        .icon-food-supply-crate { background-position: -360px 0; }
+        .icon-integrated-chip { background-position: -420px 0; }
+        .icon-identity-card { background-position: -480px 0; }
+        .icon-energy-drive { background-position: -540px 0; }
+        .icon-precision-gear { background-position: -600px 0; }
+        .quantity {
+            width: 40px;
+            text-align: center;
+        }
+        #total-cost {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding: 20px;
+        }
+        #footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 75%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resource Cost Calculator</h1>
+    <div class="icon-container" id="icon-container"></div>
+    <div id="total-cost">Total Cost: 0 gems</div>
+    <div id="footer">Quickly hacked up by <a href="https://github.com/psychowood/survivorio-ace-orderer-cost-calculator">psychowood</a>, largely inspired from survivor.io <a href="https://docs.google.com/spreadsheets/d/1UC2fIrARNptzOUs-fhYan5RKCyzQotvz3mPUAinATtI/edit?usp=sharing">order center gem calculator</a> by AroanV</div>
+
+    <script>
+        const items = [
+            { name: 'Wood', cost: 12, iconClass: 'icon-wood' },
+            { name: 'Iron', cost: 4, iconClass: 'icon-iron' },
+            { name: 'Steel', cost: 12, iconClass: 'icon-steel' },
+            { name: 'Crystone', cost: 3, iconClass: 'icon-crystone' },
+            { name: 'Weapon Supply Crate', cost: 6, iconClass: 'icon-weapon-supply-crate' },
+            { name: 'Medical Supply Crate', cost: 12, iconClass: 'icon-medical-supply-crate' },
+            { name: 'Food Supply Crate', cost: 4, iconClass: 'icon-food-supply-crate' },
+            { name: 'Integrated Chip', cost: 1, iconClass: 'icon-integrated-chip' },
+            { name: 'Identity Card', cost: 0.5, iconClass: 'icon-identity-card' },
+            { name: 'Energy Drive', cost: 3, iconClass: 'icon-energy-drive' },
+            { name: 'Precision Gear', cost: 6, iconClass: 'icon-precision-gear' },
+        ];
+
+        const iconContainer = document.getElementById('icon-container');
+        const totalCostElement = document.getElementById('total-cost');
+
+        function createItemElement(item, index) {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'item';
+            itemElement.innerHTML = `
+                <div class="icon ${item.iconClass}"></div>
+                <p class="name">${item.name}</p>
+                <p>Cost: ${Math.round(1/item.cost * 100) / 100}</p>
+                <button onclick="changeQuantity(${index}, -1)">-</button>
+                <input type="number" class="quantity" value="0" min="0" onchange="updateTotalCost()" data-index="${index}">
+                <button onclick="changeQuantity(${index}, 1)">+</button>
+            `;
+            return itemElement;
+        }
+
+        items.forEach((item, index) => {
+            iconContainer.appendChild(createItemElement(item, index));
+        });
+
+        function changeQuantity(index, change) {
+            const input = document.querySelector(`input[data-index="${index}"]`);
+            input.value = Math.max(0, parseInt(input.value) + change);
+            updateTotalCost();
+        }
+
+        function updateTotalCost() {
+            const quantities = Array.from(document.querySelectorAll('.quantity')).map(input => parseInt(input.value));
+            const totalCost = items.reduce((sum, item, index) => sum + 1/item.cost*80 * quantities[index], 0);
+            totalCostElement.textContent = `Total Cost: ${Math.round(totalCost * 100)/100} gems / ${Math.round(totalCost/80 * 100)/100} hourglasses`;
+        }
+    </script>
+</body>
+</html>
